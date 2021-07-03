@@ -2,39 +2,43 @@ package com.todolist.todolist.service;
 
 import com.todolist.todolist.repository.Todo;
 import com.todolist.todolist.repository.TodoRepository;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Transactional
 @Service
-public class TodoService{
+public class TodoService {
     private TodoRepository todoRepository;
-    private Todo todo;
 
-    public Iterable<Todo> selectTodos(){
-        return todoRepository.findAll();
+
+    public void selectTodos() {
+        todoRepository.findAll();
     }
 
-    public void insertTodo(String todoName){
-        todoRepository.save(todo);
+    public void insertTodo(Todo todo) {
+        Todo newTodo = new Todo(todo);
+        todoRepository.save(newTodo);
     }
 
-    public Todo updateTodo(int todoId){
-        if(todoRepository.findById(todoId).equals(null)){
+    public void updateTodo(int todoId) {
+        if (todoRepository.findById(todoId).isEmpty()) {
             try {
-                throw new Exception();
-            } catch (Exception e) {
+                throw new NotFoundException(todoId + "not found");
+            } catch (NotFoundException e) {
                 e.printStackTrace();
             }
         }
 
-        todo.setCompleted(!todo.isCompleted());
-        return todoRepository.save(todo);
+        Optional<Todo> oldTodo = todoRepository.findById(todoId);
+        Todo newTodo = new Todo(oldTodo);
+        todoRepository.save(newTodo);
     }
 
-    public void delete(int todoId){
-        if(!todoRepository.findById(todoId).equals(null)){
+    public void delete(int todoId) {
+        if (todoRepository.findById(todoId).isPresent()) {
             todoRepository.deleteById(todoId);
         }
     }
