@@ -1,12 +1,15 @@
 package com.todolist.todolist.controller;
 
-import lombok.Data;
-
-@Data
 public class TodoRequest {
-    private String todoName;
+    private String todoSubject;
 
-    public TodoRequest(String todoName) {
-        this.todoName = todoName;
+    public TodoRequest() {
+
     }
+
+    public String getTodoSubject() {
+        return todoSubject;
+    }
+
 }
+
