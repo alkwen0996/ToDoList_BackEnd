@@ -1,21 +1,34 @@
 package com.todolist.todolist.controller;
 
 import com.todolist.todolist.repository.Todo;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Optional;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class TodoResponse {
-    private Integer id;
+    private int id;
     private String todoSubject;
     private boolean completed;
 
+    public int getId() {
+        return id;
+    }
+
+    public String getTodoSubject() {
+        return todoSubject;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
     public TodoResponse(Todo newTodo) {
-        this.id = newTodo.getId();
-        this.todoSubject = newTodo.getTodoSubject();
-        this.completed = newTodo.isCompleted();
+        this.id = newTodo.todoId();
+        this.todoSubject = newTodo.todoSubject();
+        this.completed = newTodo.todoCompleted();
+    }
+
+    public TodoResponse(Optional<Todo> todo) {
+        this.id = todo.get().todoId();
+        this.todoSubject = todo.get().todoSubject();
+        this.completed = todo.get().todoCompleted();
     }
 }

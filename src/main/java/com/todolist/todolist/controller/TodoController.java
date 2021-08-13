@@ -1,40 +1,43 @@
 package com.todolist.todolist.controller;
 
-import com.todolist.todolist.repository.Todo;
 import com.todolist.todolist.service.TodoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
-@RequestMapping("/todo")
+@RequestMapping("/todos")
 public class TodoController {
 
-    @Autowired
-    private TodoService todoService;
+    private final TodoService todoService;
+
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    }
 
     @GetMapping
-    public ResponseEntity<Iterable<Todo>> selectTodos() {
-        Iterable<Todo> list = todoService.selectTodos();
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<TodoResponse>> selectTodos() {
+        return ResponseEntity.ok(todoService.selectTodos());
+    }
+
+    @GetMapping("/{todoId}")
+    public ResponseEntity<List<TodoResponse>> selectTodo(@PathVariable("todoId") int todoId) {
+        return ResponseEntity.ok(todoService.selectTodo(todoId));
     }
 
     @PostMapping
     public ResponseEntity<TodoResponse> insertTodo(@RequestBody TodoRequest todoRequest) {
-        Todo newTodo = todoService.insertTodo(todoRequest);
-        return ResponseEntity.ok(new TodoResponse(newTodo));
+        return ResponseEntity.ok(new TodoResponse(todoService.insertTodo(todoRequest)));
     }
 
-    @PutMapping("/update/{todoId}")
+    @PutMapping("/{todoId}")
     public ResponseEntity<TodoResponse> updateTodo(@PathVariable("todoId") int todoId) {
-        Todo newTodo = todoService.updateTodo(todoId);
-        return ResponseEntity.ok(new TodoResponse(newTodo));
+        return ResponseEntity.ok(new TodoResponse(todoService.updateTodo(todoId)));
     }
 
-    @DeleteMapping("/delete/{todoId}")
-    public ResponseEntity<Iterable<Todo>> deleteTodo(@PathVariable("todoId") int todoId) {
+    @DeleteMapping("/{todoId}")
+  public ResponseEntity<List<TodoResponse>> deleteTodo(@PathVariable("todoId") int todoId) {
         todoService.delete(todoId);
-        Iterable<Todo> list = todoService.selectTodos();
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(todoService.selectTodos());
     }
 }

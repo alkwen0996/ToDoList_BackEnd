@@ -1,23 +1,35 @@
 package com.todolist.todolist.service;
 
 import com.todolist.todolist.controller.TodoRequest;
+import com.todolist.todolist.controller.TodoResponse;
 import com.todolist.todolist.repository.Todo;
 import com.todolist.todolist.repository.TodoRepository;
-import javassist.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Transactional
 @Service
 public class TodoService {
-    @Autowired
-    private TodoRepository todoRepository;
 
-    public Iterable<Todo> selectTodos() {
-        return todoRepository.findAll();
+    private final TodoRepository todoRepository;
+
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
+
+    public List<TodoResponse> selectTodos() {
+        List<Todo> todos = todoRepository.findAll();
+        return todos.stream().map(TodoResponse::new).collect(Collectors.toList());
+    }
+
+    public List<TodoResponse> selectTodo(int todoId) {
+        Optional<Todo> todo = todoRepository.findById(todoId);
+        return todo.stream().map(TodoResponse::new).collect(Collectors.toList());
     }
 
     public Todo insertTodo(TodoRequest todoRequest) {
@@ -27,18 +39,11 @@ public class TodoService {
     }
 
     public Todo updateTodo(int todoId) {
-        if (todoRepository.findById(todoId).isEmpty()) {
-            try {
-                throw new NotFoundException(todoId + " not found");
-            } catch (NotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
         Optional<Todo> oldTodo = todoRepository.findById(todoId);
-        Todo newTodo = new Todo(oldTodo);
-        todoRepository.save(newTodo);
-        return newTodo;
+        Todo newTodos = new Todo(oldTodo);
+        todoRepository.save(newTodos);
+
+        return newTodos;
     }
 
     public void delete(int todoId) {
